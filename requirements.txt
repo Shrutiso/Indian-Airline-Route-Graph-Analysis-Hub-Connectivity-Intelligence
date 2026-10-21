@@ -1,0 +1,11 @@
+# AeroGraphX India - Environment Dependencies
+# Compatible with Python 3.12 / 3.13 / 3.14 on Windows
+
+streamlit>=1.35.0,<=1.58.0
+pandas>=2.2.0
+numpy>=1.26.0
+networkx>=3.2.0
+plotly>=5.20.0
+matplotlib>=3.8.0
+scipy>=1.12.0
+pytest>=8.0.0
