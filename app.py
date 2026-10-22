@@ -83,9 +83,18 @@ CUSTOM_CSS = """
     /* Global Typography & Base Theme */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    html, body, [class*="css"] {
+    html, body, [class*="css"], .stApp {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: #0F172A;
+        color: #0F172A !important;
+        background-color: #FFFFFF !important;
+    }
+
+    /* Force Light Header and App Canvas */
+    header[data-testid="stHeader"] {
+        background-color: #FFFFFF !important;
+    }
+    .stApp > header {
+        background-color: #FFFFFF !important;
     }
 
     /* Main Container Padding */
@@ -95,6 +104,7 @@ CUSTOM_CSS = """
         padding-left: 2.5rem;
         padding-right: 2.5rem;
         max-width: 1360px;
+        background-color: #FFFFFF !important;
     }
 
     /* Enterprise Metric Card */
@@ -230,8 +240,11 @@ CUSTOM_CSS = """
 
     /* Sidebar Refinements */
     section[data-testid="stSidebar"] {
-        background-color: #F8FAFC;
-        border-right: 1px solid #E2E8F0;
+        background-color: #F8FAFC !important;
+        border-right: 1px solid #E2E8F0 !important;
+    }
+    section[data-testid="stSidebar"] > div {
+        background-color: #F8FAFC !important;
     }
     .sidebar-brand-box {
         padding: 12px 4px 18px 4px;
@@ -1189,7 +1202,7 @@ val edgeOutput = edgeRows.map { row =>
 edgeOutput.coalesce(1).write.mode("overwrite").option("header", "true").csv("output/graph_edges")''', language="scala")
 
         with c_tab_py:
-            st.caption("Extracted from scripts/build_visualization.py & src/visualizations.py")
+            st.caption("Extracted from Task_6_Network_Visualization/task_6_interactive_network.py & src/visualizations.py")
             st.code('''# TASK 6: Visualize Route Network Using Hub Connectivity Chart
 import pandas as pd
 import plotly.graph_objects as go
@@ -1486,6 +1499,257 @@ def render_methodology():
         )
 
 
+# Page 7: Major Findings & Summary
+def render_major_findings_and_summary():
+    st.markdown(
+        f"""
+        <div style="margin-bottom:1.5rem;">
+            <div class="meridian-badge">Executive Summary</div>
+            <h2>Major Findings & Project Summary</h2>
+            <p style="color:#475569;">A concise, evidence-based synthesis of key discoveries, network statistics, and civil aviation implications derived from all 6 project tasks.</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    flights_df, airports_df, merged_df, isolated_df, G, report = get_cached_airline_pipeline()
+
+    # 1. High-Level Numerical Summary Cards
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.markdown(
+            f"""
+            <div class="meridian-metric-card">
+                <div class="metric-label">Flight Schedules Processed</div>
+                <div class="metric-value">{TOTAL_SCHEDULES_COUNT:,}</div>
+                <div class="metric-sub">Domestic flights (2018–2025)</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with c2:
+        st.markdown(
+            f"""
+            <div class="meridian-metric-card">
+                <div class="metric-label">Directed Corridors</div>
+                <div class="metric-value">{DIRECTED_CORRIDORS_COUNT:,}</div>
+                <div class="metric-sub">Origin → Destination routes</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with c3:
+        st.markdown(
+            f"""
+            <div class="meridian-metric-card">
+                <div class="metric-label">Registered Airports</div>
+                <div class="metric-value">{TOTAL_REGISTERED_AIRPORTS}</div>
+                <div class="metric-sub">110 Active + 43 Isolated (28.1%)</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with c4:
+        st.markdown(
+            f"""
+            <div class="meridian-metric-card">
+                <div class="metric-label">Foremost National Hub</div>
+                <div class="metric-value" style="color:#0284C7;">Delhi (DEL)</div>
+                <div class="metric-sub">156 Conns | 0.5132 Centrality</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+
+    # 2. Key Discoveries by Task
+    st.subheader("Key Findings by Project Task")
+
+    col_left, col_right = st.columns(2)
+
+    with col_left:
+        st.markdown(
+            """
+            <div class="meridian-panel" style="border-left: 5px solid #0284C7; height: 100%;">
+                <h4 style="color:#0284C7; margin-bottom:8px;">1. Graph Topology & Mega-Hub Dominance (Tasks 1, 2 & 3)</h4>
+                <ul style="font-size:0.88rem; color:#334155; line-height:1.6; padding-left:1.2rem; margin:0;">
+                    <li><strong>Hub-and-Spoke Architecture:</strong> India's domestic route network exhibits heavy traffic centralization around four primary pillars: <strong>Delhi (DEL), Bengaluru (BLR), Mumbai (BOM), and Hyderabad (HYD)</strong>.</li>
+                    <li><strong>Delhi's Hegemony:</strong> Delhi connects directly to <strong>51.3% of all airports in India</strong> (77 inbound routes, 79 outbound routes; Degree Centrality = <strong>0.5132</strong>).</li>
+                    <li><strong>Power-Law Connectivity:</strong> Connectivity decays sharply after the top 10 hubs. The top 4 hubs handle more than 50% of all domestic passenger transit schedules.</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+        st.markdown(
+            """
+            <div class="meridian-panel" style="border-left: 5px solid #EF4444; height: 100%;">
+                <h4 style="color:#EF4444; margin-bottom:8px;">2. Regional Aviation Desert & 43 Isolated Airstrips (Task 4)</h4>
+                <ul style="font-size:0.88rem; color:#334155; line-height:1.6; padding-left:1.2rem; margin:0;">
+                    <li><strong>28.1% Infrastructure Underutilization:</strong> <strong>43 out of 153 registered facilities</strong> have zero commercial flights in schedule records.</li>
+                    <li><strong>Geographic Categories:</strong>
+                        <ul style="margin-top:4px;">
+                            <li><em>Remote Island Bases:</em> Car Nicobar, Campbell Bay (INS Baaz), Kavaratti.</li>
+                            <li><em>Himalayan Defense ALGs:</em> Mechuka, Tuting, Ziro, Walong in Arunachal Pradesh.</li>
+                            <li><em>Unserved Regional Strips:</em> Utkela, Jeypore, Solapur, Gondia, Burnpur.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Least-Connected Commercial Feeder Strips:</strong> Bidar, Ludhiana, and Pathankot operate on only <strong>1 single direct connection</strong>.</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col_right:
+        st.markdown(
+            """
+            <div class="meridian-panel" style="border-left: 5px solid #8B5CF6; height: 100%;">
+                <h4 style="color:#8B5CF6; margin-bottom:8px;">3. Transit Authority via PageRank (Task 5)</h4>
+                <ul style="font-size:0.88rem; color:#334155; line-height:1.6; padding-left:1.2rem; margin:0;">
+                    <li><strong>Prestige vs Raw Quantity:</strong> While Degree Centrality counts the raw number of connections, PageRank measures how prestigious and influential those connected neighbors are.</li>
+                    <li><strong>Top Ranked Transit Authorities:</strong>
+                        <ul style="margin-top:4px;">
+                            <li><strong>Delhi:</strong> PageRank = <strong>7.0548</strong> (Primary National Gateway)</li>
+                            <li><strong>Bengaluru:</strong> PageRank = <strong>6.3515</strong> (Southern Tech Core)</li>
+                            <li><strong>Mumbai:</strong> PageRank = <strong>6.0183</strong> (Western Financial Core)</li>
+                            <li><strong>Hyderabad:</strong> PageRank = <strong>5.8948</strong> (South-Central Transit Hub)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Frequency Matters:</strong> The <strong>Srinagar–Delhi corridor</strong> (470 recorded flights) elevates Srinagar's PageRank influence due to dense connectivity to the capital.</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+        st.markdown(
+            """
+            <div class="meridian-panel" style="border-left: 5px solid #10B981; height: 100%;">
+                <h4 style="color:#10B981; margin-bottom:8px;">4. Carrier Market Concentration (Route EDA)</h4>
+                <ul style="font-size:0.88rem; color:#334155; line-height:1.6; padding-left:1.2rem; margin:0;">
+                    <li><strong>Airline Dominance:</strong> <strong>IndiGo commands 56.5%</strong> of all domestic flight schedules (19,066 of 33,734 records), followed by SpiceJet (10.0%) and Air India (9.2%).</li>
+                    <li><strong>Trunk Corridors:</strong> The busiest route corridors in India are:
+                        <ul style="margin-top:4px;">
+                            <li>Srinagar → Delhi (470 schedules)</li>
+                            <li>Mumbai → Delhi (354 schedules)</li>
+                            <li>Jammu → Srinagar (336 schedules)</li>
+                            <li>Jammu → Delhi (298 schedules)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+
+    # 3. Top Hubs Summary Table
+    st.subheader("Top 5 National Hubs Comparison")
+    top_hubs_data = [
+        {"Rank": 1, "Airport": "Delhi", "IATA": "DEL", "Inbound": 77, "Outbound": 79, "Total Conns": 156, "Degree Centrality": 0.5132, "PageRank": 7.0548, "Strategic Role": "Primary National Gateway & Busiest Hub"},
+        {"Rank": 2, "Airport": "Bengaluru", "IATA": "BLR", "Inbound": 71, "Outbound": 71, "Total Conns": 142, "Degree Centrality": 0.4671, "PageRank": 6.3515, "Strategic Role": "Southern Tech & Aviation Backbone"},
+        {"Rank": 3, "Airport": "Hyderabad", "IATA": "HYD", "Inbound": 68, "Outbound": 68, "Total Conns": 136, "Degree Centrality": 0.4474, "PageRank": 5.8948, "Strategic Role": "Major South-Central Transit Core"},
+        {"Rank": 4, "Airport": "Mumbai", "IATA": "BOM", "Inbound": 68, "Outbound": 68, "Total Conns": 136, "Degree Centrality": 0.4474, "PageRank": 6.0183, "Strategic Role": "Western Commercial & Financial Hub"},
+        {"Rank": 5, "Airport": "Kolkata", "IATA": "CCU", "Inbound": 54, "Outbound": 54, "Total Conns": 108, "Degree Centrality": 0.3553, "PageRank": 5.2368, "Strategic Role": "Eastern India & Northeast Gateway"},
+    ]
+    st.dataframe(
+        pd.DataFrame(top_hubs_data).set_index("Rank"),
+        use_container_width=True
+    )
+
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+
+    # 4. Practical Implications & Recommendations
+    st.subheader("Practical Implications for Civil Aviation Policy")
+
+    p1, p2, p3 = st.columns(3)
+    with p1:
+        st.markdown(
+            """
+            <div class="meridian-panel">
+                <h4 style="color:#0284C7; margin-bottom:6px;">1. Justification for UDAN Scheme</h4>
+                <p style="font-size:0.85rem; color:#475569; line-height:1.5; margin:0;">
+                    The discovery of 43 completely unserved airstrips mathematically substantiates the necessity for <strong>Viability Gap Funding (VGF)</strong> under UDAN Phase 5.0, prioritizing the Northeast and Eastern zones.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with p2:
+        st.markdown(
+            """
+            <div class="meridian-panel">
+                <h4 style="color:#F59E0B; margin-bottom:6px;">2. Mega-Hub Slot Decongestion</h4>
+                <p style="font-size:0.85rem; color:#475569; line-height:1.5; margin:0;">
+                    Delhi and Mumbai operate under extreme airspace congestion. Developing secondary twin airports (<strong>Noida Jewar</strong> and <strong>Navi Mumbai</strong>) is vital to alleviate single-point-of-failure bottlenecks.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with p3:
+        st.markdown(
+            """
+            <div class="meridian-panel">
+                <h4 style="color:#10B981; margin-bottom:6px;">3. Direct Tier-2 Corridors</h4>
+                <p style="font-size:0.85rem; color:#475569; line-height:1.5; margin:0;">
+                    Carriers can bypass congested metro transit hubs by launching direct point-to-point flights connecting thriving Tier-2 economic centers (e.g. Pune–Guwahati, Ahmedabad–Coimbatore).
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+
+    # 5. Overall Project Conclusion
+    st.markdown(
+        """
+        <div class="meridian-panel" style="background-color: #F8FAFC; border: 1px solid #CBD5E1;">
+            <h3 style="color:#0F172A; margin-top:0;">Overall Project Conclusion</h3>
+            <p style="font-size:0.92rem; color:#334155; line-height:1.6; margin:0;">
+                By modeling India's domestic flight schedules as a <strong>Directed Multigraph of 153 airport vertices and 1,423 route corridors</strong>, 
+                this project demonstrates that Indian civil aviation operates as an efficient yet centralized <strong>Hub-and-Spoke system</strong>. 
+                While mega-hubs like Delhi and Bengaluru provide vital national connectivity, the network faces two major structural vulnerabilities: 
+                <strong>airspace saturation at top hubs</strong> and a <strong>28.1% regional connectivity deficit</strong> where 43 aerodromes remain completely unserved. 
+                Balancing these disparities through secondary hub development and subsidized regional routes will be essential for resilient, inclusive aviation growth.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+
+    # 6. Viva Demonstration Guide
+    with st.expander("Teacher Demonstration & Viva Quick Guide (Click to Expand)"):
+        st.markdown(
+            """
+            **Key Questions to Answer Confidently in Your Viva:**
+            
+            1. **Q: Why construct a Directed Graph instead of an Undirected Graph?**
+               - *Answer:* Flight operations are directional. Flight schedules, slot capacities, and passenger demands from City A to City B are not always identical in reverse.
+            
+            2. **Q: Why fuse the 153-airport Master Registry with flight schedules?**
+               - *Answer:* In schedule datasets like `Air-Clean.csv`, an airport only appears if it has at least one scheduled flight. A purely route-derived graph would omit unserved airports, masking the 43 isolated regional and defense strips.
+            
+            3. **Q: What is the difference between Degree Centrality and PageRank?**
+               - *Answer:* Degree Centrality measures raw direct connection volume (Delhi connects to 156 routes). PageRank evaluates the quality and transit authority of those connections (connecting to Delhi or Mumbai confers higher network importance than connecting to a remote feeder strip).
+            
+            4. **Q: Which airport is the busiest in India?**
+               - *Answer:* Delhi (Indira Gandhi International Airport, DEL) with 156 direct connections (77 inbound, 79 outbound), Degree Centrality of 0.5132, and highest PageRank of 7.0548.
+            """
+        )
+
+
 # Global Layout Router
 def main():
     render_sidebar()
@@ -1504,12 +1768,8 @@ def main():
         render_pagerank()
     elif current_page == "Task 6: Route Network & Hub Connectivity Chart":
         render_route_network()
-    elif current_page == "Business Insights & Strategy":
-        render_business_insights()
-    elif current_page == "Data Explorer & Export Center":
-        render_data_explorer()
-    elif current_page == "Methodology & Graph Theory":
-        render_methodology()
+    elif current_page == "Major Findings & Summary":
+        render_major_findings_and_summary()
     else:
         render_overview()
 

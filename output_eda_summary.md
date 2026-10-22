@@ -1,12 +1,12 @@
-# Indian Airline Route Graph & Airport Master Dataset - EDA Summary
+# Indian Airline Route Network & Master Airports - EDA Summary
 
 ## 1. Flight Schedule Dataset (`data/Air-Clean.csv`)
 - **Total Records:** 33,734 schedule records (2018–2025)
-- **Unique Directed Flight Routes:** 1,423 routes
-- **Airlines Represented:** 14 (IndiGo, Air India, SpiceJet, GoAir, Vistara, AirAsia, etc.)
-- **Active Airport Vertices:** 110 locations
+- **Unique Directed Flight Routes:** 1,423 corridors
+- **Airlines Represented:** 14 (IndiGo, Air India, SpiceJet, GoAir, Vistara, etc.)
+- **Active Airport Vertices:** 110 cities
 
-### Top Flight Corridors by Frequency
+### Top 10 Flight Corridors by Frequency
 | Origin | Destination | Recorded Schedules |
 | :--- | :--- | :--- |
 | Srinagar | Delhi | 470 |
@@ -22,8 +22,12 @@
 
 ## 2. Airport Master Registry (`data/indian_airports_master.csv`)
 - **Total Registered Vertices:** 153
-- **Commercial Vertices:** 0
-- **Isolated Vertices:** 43
+- **Commercial Vertices:** 110
+- **Genuinely Isolated Vertices (0 Flights):** 43
 
-### Why Isolated Vertices Matter in Graph Analytics
-In real-world airline and transit systems, relying only on schedule edge tables (`Air-Clean.csv`) conceals non-operational airports, UDAN regional strips, defense airbases, and unserved locations. By fusing the **Master Airport Registry** as vertices, GraphX correctly evaluates both high-centrality mega-hubs (Delhi, Mumbai, Bengaluru) and zero-degree isolated nodes (Car Nicobar, Gondia, Utkela, Mechuka, Solapur).
+### Aviation Significance of Isolated Vertices
+In real-world airline networks, calculating graph metrics solely from flight schedule tables (`Air-Clean.csv`)
+introduces selection bias: an unserved airport never appears as an origin or destination.
+By compiling and fusing the **Master Airport Registry** (153 facilities) as graph vertices, GraphX and NetworkX
+accurately measure both high-centrality mega-hubs (Delhi, Mumbai, Bengaluru) and zero-degree isolated regional strips
+(Car Nicobar, Utkela, Mechuka, Solapur, Gondia).

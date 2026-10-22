@@ -3,9 +3,16 @@ Project 12: Airline Route Graph Analysis
 Simple, clear, and direct Python implementation following all task specifications.
 """
 
+from pathlib import Path
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
+
+# Resolve base project directory so paths work from anywhere
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 print("=========================================================")
 print("     PROJECT 12: AIRLINE ROUTE GRAPH ANALYSIS           ")
@@ -17,8 +24,8 @@ print("=========================================================\n")
 print("--- [TASK 1] Loading Data & Constructing Directed Graph ---")
 
 # Load route data and master airports list
-routes_df = pd.read_csv('data/Air-Clean.csv')
-airports_df = pd.read_csv('data/indian_airports_master.csv')
+routes_df = pd.read_csv(DATA_DIR / 'Air-Clean.csv')
+airports_df = pd.read_csv(DATA_DIR / 'indian_airports_master.csv')
 
 # Strip whitespace from city names
 routes_df['origin'] = routes_df['origin'].str.strip()
@@ -132,8 +139,9 @@ for rank, (_, row) in enumerate(conn_df.head(10).iterrows(), 1):
     print(f" {rank:2d}. {row['Airport']:<18} | PageRank: {row['PageRank']:.5f} | Connections: {row['Total_Connections']}")
 
 # Save full results to CSV
-conn_df.to_csv('output/python_airport_analysis.csv', index=False)
-print("\nFull analysis results saved to: output/python_airport_analysis.csv\n")
+output_csv = OUTPUT_DIR / 'python_airport_analysis.csv'
+conn_df.to_csv(output_csv, index=False)
+print(f"\nFull analysis results saved to: {output_csv}\n")
 
 
 # -------------------------------------------------------------------------
@@ -174,7 +182,7 @@ plt.title('Hub Connectivity Network (Top 20 Airports)', fontsize=12, fontweight=
 plt.axis('off')
 
 plt.tight_layout()
-chart_path = 'output/hub_connectivity_chart.png'
+chart_path = OUTPUT_DIR / 'hub_connectivity_chart.png'
 plt.savefig(chart_path, dpi=300, bbox_inches='tight')
 plt.close()
 
